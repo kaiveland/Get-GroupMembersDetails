@@ -35,17 +35,28 @@ Function Get-ADGroupMembersType
 	param ($groupName)
 	
 	$result = @()
+	$i = 0
+	$j = 0
 	
 	$groupMembers = Get-ADGroupMember -Identity $groupName
 	foreach ($groupMember in $groupMembers)
 	{
 		switch ($groupMember.objectClass)
 			{
-				'user' { $result += 1 }
-				'group' { $result += 2 }
+				'user' 
+						{ 
+							$result += 1
+							$i++
+						}
+				'group' 
+						{ 
+							$result += 2
+							$j++
+						}
 				default { $result += 0 }
 			}
 	}
+	Write-Host $i 'users (direct members),' $j 'groups in source group'
 	return $result
 }
 
@@ -80,6 +91,7 @@ Remove-Item -Recurse -Force $collection_path
 $source_group = $Identity
 Write-Verbose -Message "Getting subordinate groups..."
 $GroupMembers = Get-ADGroupMember -Identity $source_group
+
 if ($GroupMembers -eq $Null)
 {
 	Write-Host "No such group in Active Directory"
