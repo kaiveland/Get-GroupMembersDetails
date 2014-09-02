@@ -11,6 +11,45 @@ Param
 )
 #--------------------------------
 
+#----------------------
+#
+#   Functions section
+#
+#----------------------
+
+Function Convert-CsvToXls 
+{
+	param ($csv_filepath, $xls_filepath)
+	
+	$csv_entries = Import-Csv -Path $csv_filepath
+	$num_of_lines = $csv_entries.Count
+	$xl = New-Object -comobject Excel.Application
+	$xl.DisplayAlerts = $False
+	# Create a workbook
+	$wb = $xl.Workbooks.open($xls_filepath)
+	$num_sheets = $xl.sheetsInNewWorkbook
+}
+
+Function Get-ADGroupMembersType 
+{
+	param ($groupName)
+	
+	$groupMembers = Get-ADGroupMember -Identity $groupName
+	$i = 1
+	foreach ($groupMember in $groupMembers)
+	{
+		switch ($groupMember.objectClass)
+			{
+				'user' { $Ans[$i] = 1 }
+				'group' { $Ans[$i] = 2 }
+				default { $Ans[$i] = 0 }
+			}
+		$i++
+	}
+}
+
+#-----END-OF-SECTION---
+
 #--------------------------------
 # Welcome info message
 #--------------------------------
@@ -91,27 +130,6 @@ if (Test-Path $pathToTemp)
 }
 
 if (!($ConvertToExcel)) { Exit } 
-
-#----------------------
-#
-#   Functions section
-#
-#----------------------
-
-Function Convert-CsvToXls 
-{
-	param ($csv_filepath, $xls_filepath)
-	
-	$csv_entries = Import-Csv -Path $csv_filepath
-	$num_of_lines = $csv_entries.Count
-	$xl = New-Object -comobject Excel.Application
-	$xl.DisplayAlerts = $False
-	# Create a workbook
-	$wb = $xl.Workbooks.open($xls_filepath)
-	$num_sheets = $xl.sheetsInNewWorkbook
-}
-
-#-----END-OF-SECTION---
 
 $collection = Get-ChildItem $collection_path -include *.csv
 $csv_count=$collection.Count
