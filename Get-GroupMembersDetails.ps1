@@ -34,18 +34,19 @@ Function Get-ADGroupMembersType
 {
 	param ($groupName)
 	
+	$result = @()
+	
 	$groupMembers = Get-ADGroupMember -Identity $groupName
-	$i = 1
 	foreach ($groupMember in $groupMembers)
 	{
 		switch ($groupMember.objectClass)
 			{
-				'user' { $Ans[$i] = 1 }
-				'group' { $Ans[$i] = 2 }
-				default { $Ans[$i] = 0 }
+				'user' { $result += 1 }
+				'group' { $result += 2 }
+				default { $result += 0 }
 			}
-		$i++
 	}
+	return $result
 }
 
 #-----END-OF-SECTION---
